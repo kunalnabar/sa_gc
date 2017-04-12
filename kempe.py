@@ -56,7 +56,7 @@ def neighbor(G,S):
     return Sp
     
 
-def initial(G):
+def initial(G,k=None):
     highest_color = 0
     vertex_colors = np.zeros(G.n) - 1
     for i in range(G.n):

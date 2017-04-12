@@ -47,13 +47,13 @@ def neighbor(G,S):
         del Sp[i]
     return Sp
 
-def initial(G):
+def initial(G,k=None):
     """
     :param G: the graph
     """
-    S_inital = []
+    S_initial = []
     chunk_size = G.n / (G.max_degree + 1) + 1
     vertices = range(G.n)
     for i in range(0, G.n, chunk_size):
-        S_inital.append(vertices[i:i+chunk_size])
-    return S_inital
+        S_initial.append(vertices[i:i+chunk_size])
+    return S_initial

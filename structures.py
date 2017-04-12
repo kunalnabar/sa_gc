@@ -64,4 +64,3 @@ def kneser(n,k):
                 adj_mat[i,j] = 1
                 adj_mat[j,i] = 1
     return Graph(adj_mat)
-

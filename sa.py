@@ -26,16 +26,17 @@ def valid(G,S):
                     return False
     return True
 
-def simulated_annealing(G):
+def simulated_annealing(G,k=None):
     T = INITIAL_T
-    S = initial(G)
+    S = initial(G,k)
     print('inital state found.')
     S_lim = deepcopy(S)
-    c_lim = np.inf
     c = cost(G,S)
+    c_lim = c
     N = G.n
     freezecount = 0
     c_lim_change = False
+    total_iterations = 0
     while freezecount < FREEZE_LIM:
         print('curr_cost %s' % (c_lim))
         changes = 0
@@ -45,13 +46,17 @@ def simulated_annealing(G):
             Sp = neighbor(G,S)
             cp = cost(G,Sp)
             delta = cp - c
-            if delta < 0: # downhill move
+            if delta <= 0: # downhill move
                 changes = changes + 1
                 c = cp
                 S = Sp
-                if cp < c_lim and valid(G,Sp):
+                #print('current cost= %s; lim= %s; isvalid=%s' % (cp, c_lim, valid(G,Sp)))
+                if cp <= c_lim and valid(G,Sp) and len(Sp) <= len(S_lim):
+                    #print('downhill move; isvalid=%s' % (valid(G,Sp)))
+                    #print('current cost= %s; lim= %s' % (cp, c_lim))
                     S_lim = deepcopy(Sp)
-                    c_lim_change = True
+                    if len(Sp) < len(S_lim): # check if it is strictly less
+                        c_lim_change = True
                     c_lim = cp
             else:
                 ap = np.random.random()
@@ -63,22 +68,34 @@ def simulated_annealing(G):
         if c_lim_change:
             c_lim_change = False
             freezecount = 0
-        if changes/trials < MINPERCENT:
+        if c_lim <= 0 and k != None:
+            return S_lim
+        if float(changes)/trials < MINPERCENT:
             freezecount = freezecount + 1
-        print('freezecount: %s, changes: %s, trials: %s' % (freezecount, changes, trials))
+        total_iterations += 1
+        print('%s freezecount: %s, changes/trials: %s' % (total_iterations, freezecount, float(changes)/trials))
         print('current estimate: %s' % (len(S_lim)))
-    return S_lim
+    if k == None:
+        return S_lim
+    elif k != None and c_lim != 0:
+        return [None]
 
 if __name__ == '__main__':
     graph_file = sys.argv[1]
     approach = sys.argv[2]
     from parameters import params
     globals().update(params)
+    k = None
     if approach == 'penalty' or approach == 'p':
-        from penalty import inital, neighbor, cost
+        from penalty import initial, neighbor, cost
     elif approach == 'kempe' or approach == 'k':
         from kempe import initial, neighbor, cost
+    elif approach == 'fixedk' or approach == 'f':
+        from fixedk import initial, neighbor, cost
+        k = int(sys.argv[3])
     G = Graph(graph_file)
-    S = simulated_annealing(G)
+    S = simulated_annealing(G,k)
     X = len(S)
+    if S[0] == None:
+        X = -1
     print('est. chromatic number: %s' % (X))

@@ -4,8 +4,8 @@
 params = {
     'INITIAL_T': 100,
     'TEMPFACTOR': .95,
-    'SIZEFACTOR': 16,
-    'CUTOFF': 1.0,
-    'MINPERCENT': .02,
-    'FREEZE_LIM': 1000
+    'SIZEFACTOR': 4,
+    'CUTOFF': 2,
+    'MINPERCENT': .10,
+    'FREEZE_LIM': 
 }
